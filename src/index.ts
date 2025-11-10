@@ -1,6 +1,6 @@
 require('dotenv').config();
 import express, { Request, Response } from "express";
-import { PrismaClient } from "./generated/prisma/client";
+import { Prisma, PrismaClient } from "./generated/prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -18,10 +18,26 @@ app.get("/users", async (req, res) => {
 })
 
 app.post("/users", async (req, res) => {
-  const { name, email } = req.body
-  const user = await prisma.user.create({ data: { name, email } });
-  res.json(user);
-})
+  const { name, email } = req.body;
+
+  try {
+    const user = await prisma.user.create({
+      data: { name, email },
+    });
+
+    res.status(201).json(user);
+  } catch (error: unknown) {
+    console.error("Error creating user:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return res.status(400).json({ error: "Email already exists." });
+      }
+    }
+
+    res.status(500).json({ error: "Something went wrong." });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
