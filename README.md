@@ -1,3 +1,6 @@
 # Үнэлье апп
 Үнэлье апп-ийн сервер талын код энд байрланаа.
 NodeJS болон typescript ашиглан хийж байна.
+
+# DEVELOP branch
+JWT authentication ee hiij baina.
